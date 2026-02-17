@@ -1,0 +1,6 @@
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/CMakeFiles/caparoc.dir
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/CMakeFiles/edit_cache.dir
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/CMakeFiles/rebuild_cache.dir
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/_deps/libmodbus_cpp_proj-build/CMakeFiles/modbus_cpp.dir
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/_deps/libmodbus_cpp_proj-build/CMakeFiles/edit_cache.dir
+/home/markus/PROJECTS/caparoc-utils/libcaparoc/build-fetchcheck/_deps/libmodbus_cpp_proj-build/CMakeFiles/rebuild_cache.dir
