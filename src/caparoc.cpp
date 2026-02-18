@@ -1,5 +1,4 @@
 #include "caparoc/caparoc.hpp"
-#include "caparoc/modbus_connection.hpp"
 #include "caparoc/registers.hpp"
 #include <format>
 #include <sstream>
@@ -10,12 +9,13 @@
 #include <chrono>
 
 namespace caparoc {
+inline namespace v1 {
 
 // ============================================================================
 // Generic Register Access Functions
 // ============================================================================
 
-std::optional<uint16_t> read_uint16(ModbusConnection& conn, uint16_t address) {
+std::optional<uint16_t> read_uint16(libmodbus_cpp::ModbusConnection& conn, uint16_t address) {
     uint16_t value;
     if (!conn.read_register(address, value)) {
         return std::nullopt;
@@ -23,7 +23,7 @@ std::optional<uint16_t> read_uint16(ModbusConnection& conn, uint16_t address) {
     return value;
 }
 
-std::optional<uint32_t> read_uint32(ModbusConnection& conn, uint16_t address) {
+std::optional<uint32_t> read_uint32(libmodbus_cpp::ModbusConnection& conn, uint16_t address) {
     uint16_t values[2];
     if (!conn.read_registers(address, 2, values)) {
         return std::nullopt;
@@ -32,7 +32,7 @@ std::optional<uint32_t> read_uint32(ModbusConnection& conn, uint16_t address) {
     return (static_cast<uint32_t>(values[0]) << 16) | values[1];
 }
 
-std::optional<std::string> read_string32(ModbusConnection& conn, uint16_t address) {
+std::optional<std::string> read_string32(libmodbus_cpp::ModbusConnection& conn, uint16_t address) {
     uint16_t values[16];  // 32 bytes = 16 registers
     if (!conn.read_registers(address, 16, values)) {
         return std::nullopt;
@@ -56,11 +56,11 @@ std::optional<std::string> read_string32(ModbusConnection& conn, uint16_t addres
     return result;
 }
 
-bool write_uint16(ModbusConnection& conn, uint16_t address, uint16_t value) {
+bool write_uint16(libmodbus_cpp::ModbusConnection& conn, uint16_t address, uint16_t value) {
     return conn.write_register(address, value);
 }
 
-bool write_uint32(ModbusConnection& conn, uint16_t address, uint32_t value) {
+bool write_uint32(libmodbus_cpp::ModbusConnection& conn, uint16_t address, uint32_t value) {
     uint16_t values[2];
     // MODBUS uses big endian: values[0] is high word, values[1] is low word
     values[0] = (value >> 16) & 0xFFFF;
@@ -72,7 +72,7 @@ bool write_uint32(ModbusConnection& conn, uint16_t address, uint32_t value) {
 // Validation Utility Functions
 // ============================================================================
 
-static void validate_module_number(ModbusConnection& conn, uint8_t module_number) {
+static void validate_module_number(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number) {
     auto num_modules_opt = get_number_of_connected_modules(conn);
     if (!num_modules_opt) {
         throw std::invalid_argument("Failed to read number of connected modules from device");
@@ -87,7 +87,7 @@ static void validate_module_number(ModbusConnection& conn, uint8_t module_number
     }
 }
 
-static void validate_channel_number(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
+static void validate_channel_number(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
     auto num_channels_opt = get_number_of_channels_for_module(conn, module_number);
     if (!num_channels_opt) {
         throw std::invalid_argument(std::format(
@@ -109,19 +109,19 @@ static void validate_channel_number(ModbusConnection& conn, uint8_t module_numbe
 // Control/Reset Functions (Backward Compatibility)
 // ============================================================================
 
-bool reset_application_params_power_and_cb(ModbusConnection& conn, uint16_t value) {
+bool reset_application_params_power_and_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value) {
     return write_uint16(conn, 0x0010, value);
 }
 
-bool global_channel_error_reset_all_cb(ModbusConnection& conn, uint16_t value) {
+bool global_channel_error_reset_all_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value) {
     return write_uint16(conn, 0x0011, value);
 }
 
-bool error_counter_reset_all_cb(ModbusConnection& conn, uint16_t value) {
+bool error_counter_reset_all_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value) {
     return write_uint16(conn, 0x0012, value);
 }
 
-bool reset_application_params_quint(ModbusConnection& conn, uint16_t value) {
+bool reset_application_params_quint(libmodbus_cpp::ModbusConnection& conn, uint16_t value) {
     return write_uint16(conn, 0x0020, value);
 }
 
@@ -129,17 +129,17 @@ bool reset_application_params_quint(ModbusConnection& conn, uint16_t value) {
 // Product Information Functions
 // ============================================================================
 
-std::optional<std::string> get_product_name_power_module(ModbusConnection& conn) {
+std::optional<std::string> get_product_name_power_module(libmodbus_cpp::ModbusConnection& conn) {
     return read_string32(conn, 0x1000);
 }
 
-std::optional<std::string> get_product_name_module(ModbusConnection& conn, uint8_t module_number) {
+std::optional<std::string> get_product_name_module(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number) {
     validate_module_number(conn, module_number);
     uint16_t address = 0x1010 + (module_number - 1) * 0x10;
     return read_string32(conn, address);
 }
 
-std::optional<std::string> get_product_name_quint(ModbusConnection& conn) {
+std::optional<std::string> get_product_name_quint(libmodbus_cpp::ModbusConnection& conn) {
     return read_string32(conn, 0x1110);
 }
 
@@ -288,11 +288,11 @@ std::vector<RegisterInfo> find_registers(const std::string& pattern) {
     return result;
 }
 
-std::optional<uint16_t> get_number_of_connected_modules(ModbusConnection& conn) {
+std::optional<uint16_t> get_number_of_connected_modules(libmodbus_cpp::ModbusConnection& conn) {
     return read_uint16(conn, 0x2000);
 }
 
-std::optional<uint16_t> get_number_of_channels_for_module(ModbusConnection& conn, uint8_t module_number) {
+std::optional<uint16_t> get_number_of_channels_for_module(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number) {
     if (module_number < 1 || module_number > 16) {
         return std::nullopt;
     }
@@ -301,7 +301,7 @@ std::optional<uint16_t> get_number_of_channels_for_module(ModbusConnection& conn
     return read_uint16(conn, address);
 }
 
-bool set_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, uint16_t nominal_current) {
+bool set_nominal_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, uint16_t nominal_current) {
     validate_module_number(conn, module_number);
     validate_channel_number(conn, module_number, channel_number);
 
@@ -381,7 +381,7 @@ bool set_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t 
     return true;
 }
 
-std::optional<uint16_t> get_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
+std::optional<uint16_t> get_nominal_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
     validate_module_number(conn, module_number);
     validate_channel_number(conn, module_number, channel_number);
     
@@ -393,7 +393,7 @@ std::optional<uint16_t> get_nominal_current(ModbusConnection& conn, uint8_t modu
     return read_uint16(conn, address);
 }
 
-std::string print_device_info(ModbusConnection& conn) {
+std::string print_device_info(libmodbus_cpp::ModbusConnection& conn) {
     std::ostringstream oss;
     
     // Get power module product name
@@ -519,7 +519,7 @@ std::string print_device_info(ModbusConnection& conn) {
 // System Status and Monitoring Functions
 // ============================================================================
 
-std::optional<GlobalStatus> get_global_status(ModbusConnection& conn) {
+std::optional<GlobalStatus> get_global_status(libmodbus_cpp::ModbusConnection& conn) {
     auto val = read_uint16(conn, 0x6000);
     if (!val) {
         return std::nullopt;
@@ -535,19 +535,19 @@ std::optional<GlobalStatus> get_global_status(ModbusConnection& conn) {
     return status;
 }
 
-std::optional<uint16_t> get_total_system_current(ModbusConnection& conn) {
+std::optional<uint16_t> get_total_system_current(libmodbus_cpp::ModbusConnection& conn) {
     return read_uint16(conn, 0x6001);
 }
 
-std::optional<uint16_t> get_input_voltage(ModbusConnection& conn) {
+std::optional<uint16_t> get_input_voltage(libmodbus_cpp::ModbusConnection& conn) {
     return read_uint16(conn, 0x6002);
 }
 
-std::optional<uint16_t> get_sum_of_nominal_currents(ModbusConnection& conn) {
+std::optional<uint16_t> get_sum_of_nominal_currents(libmodbus_cpp::ModbusConnection& conn) {
     return read_uint16(conn, 0x6005);
 }
 
-std::optional<int16_t> get_internal_temperature(ModbusConnection& conn) {
+std::optional<int16_t> get_internal_temperature(libmodbus_cpp::ModbusConnection& conn) {
     auto val = read_uint16(conn, 0x6009);
     if (!val) {
         return std::nullopt;
@@ -555,7 +555,7 @@ std::optional<int16_t> get_internal_temperature(ModbusConnection& conn) {
     return static_cast<int16_t>(*val);
 }
 
-std::optional<ChannelStatus> get_channel_status(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
+std::optional<ChannelStatus> get_channel_status(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
     validate_module_number(conn, module_number);
     validate_channel_number(conn, module_number, channel_number);
     
@@ -577,7 +577,7 @@ std::optional<ChannelStatus> get_channel_status(ModbusConnection& conn, uint8_t 
     return status;
 }
 
-std::optional<uint16_t> get_load_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
+std::optional<uint16_t> get_load_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number) {
     validate_module_number(conn, module_number);
     validate_channel_number(conn, module_number, channel_number);
     
@@ -585,7 +585,7 @@ std::optional<uint16_t> get_load_current(ModbusConnection& conn, uint8_t module_
     return read_uint16(conn, address);
 }
 
-bool control_channel(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, bool on) {
+bool control_channel(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, bool on) {
     validate_module_number(conn, module_number);
     validate_channel_number(conn, module_number, channel_number);
     
@@ -593,4 +593,5 @@ bool control_channel(ModbusConnection& conn, uint8_t module_number, uint8_t chan
     return write_uint16(conn, address, on ? 1 : 0);
 }
 
+} // namespace v1
 } // namespace caparoc

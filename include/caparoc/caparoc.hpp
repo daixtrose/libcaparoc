@@ -5,11 +5,10 @@
 #include <cstdint>
 #include <vector>
 #include "caparoc/registers.hpp"
+#include "libmodbus_cpp/modbus_connection.hpp"
 
 namespace caparoc {
-
-// Forward declaration
-class ModbusConnection;
+inline namespace v1 {
 
 // ============================================================================
 // Generic Register Access Functions
@@ -22,7 +21,7 @@ class ModbusConnection;
  * @param address Register address
  * @return std::optional<uint16_t> Register value if successful
  */
-std::optional<uint16_t> read_uint16(ModbusConnection& conn, uint16_t address);
+std::optional<uint16_t> read_uint16(libmodbus_cpp::ModbusConnection& conn, uint16_t address);
 
 /**
  * @brief Read a UINT32 register (2 consecutive registers)
@@ -31,7 +30,7 @@ std::optional<uint16_t> read_uint16(ModbusConnection& conn, uint16_t address);
  * @param address Starting register address
  * @return std::optional<uint32_t> Register value if successful
  */
-std::optional<uint32_t> read_uint32(ModbusConnection& conn, uint16_t address);
+std::optional<uint32_t> read_uint32(libmodbus_cpp::ModbusConnection& conn, uint16_t address);
 
 /**
  * @brief Read a String32 (32-character string from 16 consecutive registers)
@@ -40,7 +39,7 @@ std::optional<uint32_t> read_uint32(ModbusConnection& conn, uint16_t address);
  * @param address Starting register address
  * @return std::optional<std::string> String if successful
  */
-std::optional<std::string> read_string32(ModbusConnection& conn, uint16_t address);
+std::optional<std::string> read_string32(libmodbus_cpp::ModbusConnection& conn, uint16_t address);
 
 /**
  * @brief Write a UINT16 register
@@ -51,7 +50,7 @@ std::optional<std::string> read_string32(ModbusConnection& conn, uint16_t addres
  * @return true if successful
  * @return false if failed
  */
-bool write_uint16(ModbusConnection& conn, uint16_t address, uint16_t value);
+bool write_uint16(libmodbus_cpp::ModbusConnection& conn, uint16_t address, uint16_t value);
 
 /**
  * @brief Write a UINT32 register (2 consecutive registers)
@@ -62,7 +61,7 @@ bool write_uint16(ModbusConnection& conn, uint16_t address, uint16_t value);
  * @return true if successful
  * @return false if failed
  */
-bool write_uint32(ModbusConnection& conn, uint16_t address, uint32_t value);
+bool write_uint32(libmodbus_cpp::ModbusConnection& conn, uint16_t address, uint32_t value);
 
 // ============================================================================
 // Control/Reset Functions (Backward Compatibility)
@@ -76,7 +75,7 @@ bool write_uint32(ModbusConnection& conn, uint16_t address, uint32_t value);
  * @return true if write successful
  * @return false if write failed
  */
-bool reset_application_params_power_and_cb(ModbusConnection& conn, uint16_t value = 1);
+bool reset_application_params_power_and_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value = 1);
 
 /**
  * @brief Global channel error reset (All Circuit Breaker modules)
@@ -86,7 +85,7 @@ bool reset_application_params_power_and_cb(ModbusConnection& conn, uint16_t valu
  * @return true if write successful
  * @return false if write failed
  */
-bool global_channel_error_reset_all_cb(ModbusConnection& conn, uint16_t value = 1);
+bool global_channel_error_reset_all_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value = 1);
 
 /**
  * @brief Error counter reset (All Circuit Breaker modules)
@@ -96,7 +95,7 @@ bool global_channel_error_reset_all_cb(ModbusConnection& conn, uint16_t value = 
  * @return true if write successful
  * @return false if write failed
  */
-bool error_counter_reset_all_cb(ModbusConnection& conn, uint16_t value = 1);
+bool error_counter_reset_all_cb(libmodbus_cpp::ModbusConnection& conn, uint16_t value = 1);
 
 /**
  * @brief Reset application parameters to default settings (QUINT Power Supply)
@@ -106,7 +105,7 @@ bool error_counter_reset_all_cb(ModbusConnection& conn, uint16_t value = 1);
  * @return true if write successful
  * @return false if write failed
  */
-bool reset_application_params_quint(ModbusConnection& conn, uint16_t value = 1);
+bool reset_application_params_quint(libmodbus_cpp::ModbusConnection& conn, uint16_t value = 1);
 
 // ============================================================================
 // Product Information Functions
@@ -118,7 +117,7 @@ bool reset_application_params_quint(ModbusConnection& conn, uint16_t value = 1);
  * @param conn MODBUS connection
  * @return std::optional<std::string> Product name if successful
  */
-std::optional<std::string> get_product_name_power_module(ModbusConnection& conn);
+std::optional<std::string> get_product_name_power_module(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get product name for a specific module
@@ -127,7 +126,7 @@ std::optional<std::string> get_product_name_power_module(ModbusConnection& conn)
  * @param module_number Module number (1-16)
  * @return std::optional<std::string> Product name if successful
  */
-std::optional<std::string> get_product_name_module(ModbusConnection& conn, uint8_t module_number);
+std::optional<std::string> get_product_name_module(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number);
 
 /**
  * @brief Get product name for QUINT Power Supply
@@ -135,7 +134,7 @@ std::optional<std::string> get_product_name_module(ModbusConnection& conn, uint8
  * @param conn MODBUS connection
  * @return std::optional<std::string> Product name if successful
  */
-std::optional<std::string> get_product_name_quint(ModbusConnection& conn);
+std::optional<std::string> get_product_name_quint(libmodbus_cpp::ModbusConnection& conn);
 
 // ============================================================================
 // Utility Functions
@@ -171,7 +170,7 @@ std::vector<RegisterInfo> find_registers(const std::string& pattern);
  * @param conn MODBUS connection
  * @return std::optional<uint16_t> Number of connected modules if successful
  */
-std::optional<uint16_t> get_number_of_connected_modules(ModbusConnection& conn);
+std::optional<uint16_t> get_number_of_connected_modules(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get the number of channels for a specific module
@@ -180,7 +179,7 @@ std::optional<uint16_t> get_number_of_connected_modules(ModbusConnection& conn);
  * @param module_number Module number (1-16)
  * @return std::optional<uint16_t> Number of channels if successful
  */
-std::optional<uint16_t> get_number_of_channels_for_module(ModbusConnection& conn, uint8_t module_number);
+std::optional<uint16_t> get_number_of_channels_for_module(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number);
 
 /**
  * @brief Set nominal current for a module channel
@@ -196,7 +195,7 @@ std::optional<uint16_t> get_number_of_channels_for_module(ModbusConnection& conn
  * @return false if write failed
  * @throws std::invalid_argument if module_number or channel_number are out of valid range
  */
-bool set_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, uint16_t nominal_current);
+bool set_nominal_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, uint16_t nominal_current);
 
 /**
  * @brief Get nominal current for a module channel
@@ -206,7 +205,7 @@ bool set_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t 
  * @param channel_number Channel number (1-4)
  * @return std::optional<uint16_t> Nominal current in Amperes if successful
  */
-std::optional<uint16_t> get_nominal_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
+std::optional<uint16_t> get_nominal_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
 
 /**
  * @brief Print device information (connected modules, product names, and channel counts)
@@ -217,7 +216,7 @@ std::optional<uint16_t> get_nominal_current(ModbusConnection& conn, uint8_t modu
  * @param conn MODBUS connection
  * @return std::string Formatted device information
  */
-std::string print_device_info(ModbusConnection& conn);
+std::string print_device_info(libmodbus_cpp::ModbusConnection& conn);
 
 // ============================================================================
 // System Status and Monitoring Functions
@@ -253,7 +252,7 @@ struct ChannelStatus {
  * @param conn MODBUS connection
  * @return std::optional<GlobalStatus> Status if successful
  */
-std::optional<GlobalStatus> get_global_status(ModbusConnection& conn);
+std::optional<GlobalStatus> get_global_status(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get total system current (0x6001)
@@ -261,7 +260,7 @@ std::optional<GlobalStatus> get_global_status(ModbusConnection& conn);
  * @param conn MODBUS connection
  * @return std::optional<uint16_t> Current in Amperes if successful
  */
-std::optional<uint16_t> get_total_system_current(ModbusConnection& conn);
+std::optional<uint16_t> get_total_system_current(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get input voltage (0x6002)
@@ -269,7 +268,7 @@ std::optional<uint16_t> get_total_system_current(ModbusConnection& conn);
  * @param conn MODBUS connection
  * @return std::optional<uint16_t> Voltage in Volts if successful
  */
-std::optional<uint16_t> get_input_voltage(ModbusConnection& conn);
+std::optional<uint16_t> get_input_voltage(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get sum of nominal currents (0x6005)
@@ -277,7 +276,7 @@ std::optional<uint16_t> get_input_voltage(ModbusConnection& conn);
  * @param conn MODBUS connection
  * @return std::optional<uint16_t> Current in Amperes if successful
  */
-std::optional<uint16_t> get_sum_of_nominal_currents(ModbusConnection& conn);
+std::optional<uint16_t> get_sum_of_nominal_currents(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get internal temperature (0x6009)
@@ -285,7 +284,7 @@ std::optional<uint16_t> get_sum_of_nominal_currents(ModbusConnection& conn);
  * @param conn MODBUS connection
  * @return std::optional<int16_t> Temperature in °C if successful
  */
-std::optional<int16_t> get_internal_temperature(ModbusConnection& conn);
+std::optional<int16_t> get_internal_temperature(libmodbus_cpp::ModbusConnection& conn);
 
 /**
  * @brief Get channel status (0x6010-0x604F)
@@ -295,7 +294,7 @@ std::optional<int16_t> get_internal_temperature(ModbusConnection& conn);
  * @param channel_number Channel number (1-4)
  * @return std::optional<ChannelStatus> Status if successful
  */
-std::optional<ChannelStatus> get_channel_status(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
+std::optional<ChannelStatus> get_channel_status(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
 
 /**
  * @brief Get actual load current for a channel (0x6050-0x60CF)
@@ -305,7 +304,7 @@ std::optional<ChannelStatus> get_channel_status(ModbusConnection& conn, uint8_t 
  * @param channel_number Channel number (1-4)
  * @return std::optional<uint16_t> Current in milliamperes (resolution 100mA) if successful
  */
-std::optional<uint16_t> get_load_current(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
+std::optional<uint16_t> get_load_current(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number);
 
 /**
  * @brief Control channel on/off (0xC010-0xC04F)
@@ -317,6 +316,7 @@ std::optional<uint16_t> get_load_current(ModbusConnection& conn, uint8_t module_
  * @return true if write successful
  * @return false if write failed
  */
-bool control_channel(ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, bool on);
+bool control_channel(libmodbus_cpp::ModbusConnection& conn, uint8_t module_number, uint8_t channel_number, bool on);
 
+} // namespace v1
 } // namespace caparoc

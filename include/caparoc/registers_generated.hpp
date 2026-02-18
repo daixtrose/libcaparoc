@@ -3,6 +3,7 @@
 #include <cstdint>
 
 namespace caparoc {
+inline namespace v1 {
 
 // Register access types
 enum class RegisterAccess {
@@ -3138,4 +3139,5 @@ constexpr RegisterInfo register_table[] = {
 };
 constexpr size_t register_table_size = 771;
 
+} // namespace v1
 } // namespace caparoc
