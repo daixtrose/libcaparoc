@@ -57,13 +57,28 @@ elseif(MSVC)
 endif()
 
 if(LIBCAPAROC_ENABLE_CPACK)
+    install(TARGETS caparoc
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+    install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+
     set(CPACK_PACKAGE_NAME libcaparoc)
     set(CPACK_PACKAGE_VENDOR "Markus Werle")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CAPAROC library built on top of modbus_cpp")
-    set(CPACK_PACKAGE_CONTACT "")
+    set(CPACK_PACKAGE_CONTACT "daixtrose")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Markus Werle")
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_VERBATIM_VARIABLES YES)
+
+    # Standard naming with architecture: <pkg>_<ver>_<arch>.deb / <pkg>-<ver>-<rel>.<arch>.rpm
+    set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+    set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
+    set(CPACK_RPM_PACKAGE_RELEASE "1")
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CPACK_GENERATOR TGZ DEB RPM)
