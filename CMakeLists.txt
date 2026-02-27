@@ -66,7 +66,7 @@ if(LIBCAPAROC_ENABLE_CPACK)
     set(CPACK_VERBATIM_VARIABLES YES)
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(CPACK_GENERATOR TGZ)
+        set(CPACK_GENERATOR TGZ DEB RPM)
     else()
         set(CPACK_GENERATOR TGZ)
     endif()
