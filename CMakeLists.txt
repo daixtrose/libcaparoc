@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.25...4.2)
 
 project(libcaparoc
     VERSION 0.1.0
@@ -10,13 +10,17 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include(GNUInstallDirs)
 include(FetchContent)
+
+option(LIBCAPAROC_ENABLE_CPACK "Enable CPack packaging support" ${PROJECT_IS_TOP_LEVEL})
 
 if(NOT TARGET modbus_cpp)
     FetchContent_Declare(
         libmodbus_cpp_proj
         GIT_REPOSITORY https://github.com/daixtrose/libmodbus-cpp.git
-        GIT_TAG v1.0.0
+        GIT_TAG v1.1.0
+        GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(libmodbus_cpp_proj)
 endif()
@@ -29,7 +33,7 @@ add_library(libcaparoc::caparoc ALIAS caparoc)
 
 target_include_directories(caparoc
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -50,4 +54,22 @@ elseif(MSVC)
     target_compile_options(caparoc PRIVATE
         /W4
     )
+endif()
+
+if(LIBCAPAROC_ENABLE_CPACK)
+    set(CPACK_PACKAGE_NAME libcaparoc)
+    set(CPACK_PACKAGE_VENDOR "Markus Werle")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CAPAROC library built on top of modbus_cpp")
+    set(CPACK_PACKAGE_CONTACT "")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Markus Werle")
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_VERBATIM_VARIABLES YES)
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(CPACK_GENERATOR TGZ)
+    else()
+        set(CPACK_GENERATOR TGZ)
+    endif()
+
+    include(CPack)
 endif()
